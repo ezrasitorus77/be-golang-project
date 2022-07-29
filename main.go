@@ -36,7 +36,7 @@ func main() {
 
 	midd.AddRoute("/register", "POST", newUser.Register)
 	midd.AddRoute("/login", "POST", existUser.Login)
-	midd.AddRoute("/index", "PATCH", existUser.Index)
+	midd.AddRoute("/index", "GET", existUser.Index)
 
 	midd.Serve()
 	err = http.ListenAndServe(":8000", midd.Mux)
