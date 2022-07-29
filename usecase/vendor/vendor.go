@@ -1,4 +1,4 @@
-package user
+package vendor
 
 import (
 	"be-golang-project/models/handler"
@@ -9,12 +9,12 @@ var (
 	resp *response.Response = &response.Response{}
 )
 
-type User struct {
+type Vendor struct {
 	handler.ParentContext
 }
 
-func New() *User {
-	var newUser User
+func New() *Vendor {
+	var newVendor Vendor
 
-	return &newUser
+	return &newVendor
 }

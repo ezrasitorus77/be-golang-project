@@ -10,6 +10,9 @@ const (
 	AlphaLowerRegex             = "[[:lower:]]"
 	AlphaLowerValidationMessage = "Field must contain lowercase letter"
 
+	ComplexCharactersRegex             = "^[a-zA-Z]?[a-zA-Z0-9\\-\\.\\,\\(\\)\\/\\s\\+]+$"
+	ComplexCharactersValidationMessage = "Field can only contain alpahnumeric and (-.,()/\\+) symbols"
+
 	DigitOnlyRegex             = "[[:digit:]]"
 	DigitOnlyValidationMessage = "Field must contain digit"
 
@@ -46,9 +49,13 @@ const (
 	RequiredValidationMessage = "Field is required"
 	EmailValidationMessage    = "Email format does not match"
 
-	LengthMin8Max20ValidationMessage = "Must contain minimal 8 and maximum 20 characters"
-	LengthMax50ValidationMessage     = "Maximum characters is 50"
-	LengthMax20ValidationMessage     = "Maximum characters is 20"
+	Length16ValidationMessage          = "Field must contain exactly 16 characters"
+	LengthMin15Max16ValidationMessage  = "Field must contain 15 - 16 characters"
+	LengthMin8Max20ValidationMessage   = "Must contain minimal 8 and maximum 20 characters"
+	LengthMax50ValidationMessage       = "Maximum characters is 50"
+	LengthMax20ValidationMessage       = "Maximum characters is 20"
+	LengthMax10ValidationMessage       = "Maximum characters is 10"
+	LengthMin10Max100ValidationMessage = "Field must contain 10 - 100 characters"
 
 	MinSecretKeySize = 32.
 

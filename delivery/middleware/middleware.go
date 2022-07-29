@@ -4,8 +4,8 @@ import (
 	"be-golang-project/consts"
 	"be-golang-project/models/handler"
 	"be-golang-project/models/interface_"
+	"be-golang-project/models/jwt"
 	"be-golang-project/models/response"
-	"be-golang-project/models/token"
 	"errors"
 	"fmt"
 	"net/http"
@@ -27,34 +27,38 @@ type (
 	}
 
 	Route struct {
-		path   string
-		method string
-		hFunc  func(*handler.Context)
+		path    string
+		methods []string
+		hFunc   func(*handler.Context)
 	}
 )
 
-func (m *Middleware) AddRoute(path, method string, hFunc func(*handler.Context)) error {
-	if err := m.routeAvailabilityCheck(path, method, hFunc); err != nil {
+func (m *Middleware) AddRoute(path string, methodsToAdd []string, hFunc func(*handler.Context)) error {
+	if err := m.routeAvailabilityCheck(path, methodsToAdd, hFunc); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *Middleware) routeAvailabilityCheck(path, method string, hFunc func(*handler.Context)) error {
+func (m *Middleware) routeAvailabilityCheck(path string, methodsToAdd []string, hFunc func(*handler.Context)) error {
 	for _, route := range m.RouteCollections {
 		if route.path == path {
-			if route.method == method {
-				err := errors.New("Path with specific method exists")
-				return err
+			for _, method := range route.methods {
+				for _, methodToAdd := range methodsToAdd {
+					if method == methodToAdd {
+						err := errors.New("Path with specific method exists")
+						return err
+					}
+				}
 			}
 		}
 	}
 
 	m.RouteCollections = append(m.RouteCollections, Route{
-		path:   path,
-		method: method,
-		hFunc:  hFunc,
+		path:    path,
+		methods: methodsToAdd,
+		hFunc:   hFunc,
 	})
 
 	return nil
@@ -70,11 +74,13 @@ func (m *Middleware) methodCheck(w http.ResponseWriter, r *http.Request) {
 
 	for _, route := range m.RouteCollections {
 		if route.path == incomingPath {
-			if route.method == r.Method {
-				determinant = true
-				hFunc = route.hFunc
+			for _, method := range route.methods {
+				if method == r.Method {
+					determinant = true
+					hFunc = route.hFunc
 
-				break
+					break
+				}
 			}
 		}
 	}
@@ -82,7 +88,7 @@ func (m *Middleware) methodCheck(w http.ResponseWriter, r *http.Request) {
 	if !determinant {
 		resp.W = w
 		err := errors.New(fmt.Sprintf("%s doesn't accept %s method", incomingPath, r.Method))
-		resp.SendResponse(http.StatusMethodNotAllowed, consts.MethodNotAllowedRC, consts.MethodNotAllowedMessage, nil, err)
+		resp.SendResponse(http.StatusMethodNotAllowed, consts.MethodNotAllowedRC, consts.MethodNotAllowedMessage, err.Error(), err)
 
 		return
 	}
@@ -104,7 +110,7 @@ func (m *Middleware) tokenCheck(ctx *handler.Context, parentCtxDB *gorm.DB, r *h
 
 	resp.W = ctx.Value.Writer
 
-	tokenMaker, err = token.NewJWTMaker(consts.JWTSecretKey)
+	tokenMaker, err = jwt.NewJWTMaker(consts.JWTSecretKey)
 	if err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 	}

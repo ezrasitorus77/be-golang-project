@@ -26,7 +26,6 @@ type (
 		Writer     http.ResponseWriter
 		Payload    interface{}
 		HandleFunc contextFunc
-		Error      error
 		Key        string
 		JWTKey     string
 	}
@@ -50,15 +49,15 @@ func (parentCtx *ParentContext) Set(ctx *Context, w http.ResponseWriter, r *http
 	return ctx
 }
 
-func (ctx *Context) ParseRequest(model interface{}) {
+func (ctx *Context) ParseRequest(model interface{}) error {
 	var decoder *json.Decoder = json.NewDecoder(ctx.Value.Request.Body)
 
 	err := decoder.Decode(&model)
 	if err != nil {
-		ctx.Value.Error = err
+		return err
 	}
 
-	return
+	return nil
 }
 
 func (parentCtx ParentContext) GetDBSession() *gorm.DB {
