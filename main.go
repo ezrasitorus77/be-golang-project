@@ -5,7 +5,7 @@ import (
 	"be-golang-project/infrastructure"
 	"be-golang-project/models/handler"
 	"be-golang-project/models/interface_"
-	"be-golang-project/usecase/client"
+	"be-golang-project/usecase/user"
 	"be-golang-project/usecase/vendor"
 	"fmt"
 	"net/http"
@@ -17,8 +17,8 @@ func main() {
 	var (
 		midd      *middleware.Middleware = &middleware.Middleware{}
 		parentCtx *handler.ParentContext
+		newUser   interface_.User   = user.New()
 		newVendor interface_.Vendor = vendor.New()
-		newClient interface_.Client = client.New()
 		err       error
 	)
 
@@ -35,13 +35,12 @@ func main() {
 	midd.Mux = mux.NewRouter()
 	midd.Ctx = parentCtx
 
-	midd.AddRoute("/vendor-register", []string{"POST"}, newVendor.Register)
-	midd.AddRoute("/login", []string{"POST"}, newVendor.Login)
-	midd.AddRoute("/index", []string{"GET"}, newVendor.Index)
-	midd.AddRoute("/vendor-profile", []string{"GET", "POST", "DELETE"}, newVendor.Profile)
+	midd.AddRoute("/vendor/register", []string{"POST"}, newVendor.Register)
 
-	midd.AddRoute("/client-register", []string{"POST"}, newClient.Register)
-	// midd.AddRoute("/client-profile", []string{"GET", "POST", "DELETE"}, newClient.Profile)
+	midd.AddRoute("/user/register", []string{"POST"}, newUser.Register)
+	midd.AddRoute("/login", []string{"POST"}, newUser.Login)
+	midd.AddRoute("/index", []string{"GET"}, newUser.Index)
+	midd.AddRoute("/profile", []string{"GET", "POST", "DELETE"}, newUser.Profile)
 
 	midd.Serve()
 	err = http.ListenAndServe(":8000", midd.Mux)

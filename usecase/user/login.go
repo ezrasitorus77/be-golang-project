@@ -1,4 +1,4 @@
-package vendor
+package user
 
 import (
 	"be-golang-project/consts"
@@ -14,13 +14,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func (parentCtx *Vendor) Login(context_ *handler.Context) {
+func (parentCtx *User) Login(context_ *handler.Context) {
 	var (
 		tokenMaker  interface_.Maker
 		newToken    string
-		vendor      db.Vendor
-		requestBody db.Vendor
-		db          *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
+		user        db.User
+		requestBody db.User
+		DB          *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
 		err         error
 	)
 
@@ -32,19 +32,19 @@ func (parentCtx *Vendor) Login(context_ *handler.Context) {
 		return
 	}
 
-	if err = db.Where("username = ?", requestBody.UserName).Find(&vendor).Error; err != nil {
+	if err = DB.Where("username = ?", requestBody.UserName).Find(&user).Error; err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
 		return
 	}
 
-	if vendor.ID == 0 {
+	if user.ID == 0 {
 		resp.SendResponse(http.StatusOK, consts.UserNotFoundRC, consts.UserNotFoundMessage, nil, nil)
 
 		return
 	}
 
-	if ok := validation_.VerifyPassword(vendor.Password, requestBody.Password, parentCtx.Salt); !ok {
+	if ok := validation_.VerifyPassword(user.Password, requestBody.Password, parentCtx.Salt); !ok {
 		resp.SendResponse(http.StatusForbidden, consts.CredentialNotMatchRC, consts.GeneralForbiddenMessage, consts.CredentialNotMatchMessage, nil)
 
 		return
@@ -57,7 +57,7 @@ func (parentCtx *Vendor) Login(context_ *handler.Context) {
 		return
 	}
 
-	newToken, err = tokenMaker.CreateToken(vendor.ID, time.Minute)
+	newToken, err = tokenMaker.CreateToken(user.ID, time.Minute)
 	if err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
@@ -69,7 +69,7 @@ func (parentCtx *Vendor) Login(context_ *handler.Context) {
 	return
 }
 
-func (parentCtx *Vendor) Index(context_ *handler.Context) {
+func (parentCtx *User) Index(context_ *handler.Context) {
 	// var (
 	// 	user db.Vendor
 	// 	db          *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)

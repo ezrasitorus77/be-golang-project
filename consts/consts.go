@@ -33,12 +33,18 @@ const (
 	InvalidTokenRC          = "010"
 	ExpiredTokenRC          = "011"
 
+	GeneralBadRequestRC      = "400"
+	GeneralBadRequestMessage = "Bad request"
+
+	BadParamRC      = "099"
+	BadParamMessage = "Wrong URL parameter(s)"
+
 	TokenExpiredForbiddenRC = "112"
 
 	CreatedRC      = "001"
 	CreatedMessage = "Data successfully created"
 
-	GeneralInternalServerErrorRC      = "099"
+	GeneralInternalServerErrorRC      = "500"
 	GeneralInternalServerErrorMessage = "Internal server error"
 
 	MethodNotAllowedRC      = "405"

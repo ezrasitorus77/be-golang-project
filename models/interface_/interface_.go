@@ -12,14 +12,14 @@ type (
 		VerifyToken(token string) (*payload.Payload, error)
 	}
 
-	Vendor interface {
+	User interface {
 		Register(*handler.Context)
 		Login(*handler.Context)
 		Index(*handler.Context)
 		Profile(*handler.Context)
 	}
 
-	Client interface {
+	Vendor interface {
 		Register(*handler.Context)
 		// Profile(*handler.Context)
 	}

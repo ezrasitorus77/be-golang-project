@@ -1,4 +1,4 @@
-package vendor
+package user
 
 import (
 	"be-golang-project/consts"
@@ -10,10 +10,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func (parentCtx *Vendor) Register(context_ *handler.Context) {
+func (parentCtx *User) Register(context_ *handler.Context) {
 	var (
-		vendor db.Vendor
-		tx     *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB).Begin()
+		user db.User
+		tx   *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB).Begin()
 	)
 
 	defer func() {
@@ -22,22 +22,26 @@ func (parentCtx *Vendor) Register(context_ *handler.Context) {
 
 	resp.W = context_.Value.Writer
 
-	if err := context_.ParseRequest(&vendor); err != nil {
+	if err := context_.ParseRequest(&user); err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
 		return
 	}
 
-	if err := validation_.Validate(vendor, "profile"); err != nil {
+	if err := validation_.Validate(user, "register", "user"); err != nil {
 		resp.SendResponse(http.StatusOK, consts.InvalidRequestBodyRC, consts.InvalidRequestBodyMessage, nil, err)
 
 		return
 	}
 
-	if err := tx.Create(&db.Vendor{
-		UserName: vendor.UserName,
-		Password: validation_.HashPassword(vendor.Password, parentCtx.Salt),
-		Email:    vendor.Email,
+	if err := tx.Create(&db.User{
+		UserName:    user.UserName,
+		Name:        user.Name,
+		Password:    validation_.HashPassword(user.Password, parentCtx.Salt),
+		IDNumber:    user.IDNumber,
+		UserPhone:   user.UserPhone,
+		UserAddress: user.UserAddress,
+		UserRole:    user.UserRole,
 	}).Error; err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 

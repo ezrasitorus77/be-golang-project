@@ -32,26 +32,53 @@ var (
 	Symbols           = validation.Match(regexp.MustCompile(consts.SymbolsOnlyRegex)).Error(consts.SymbolsOnlyValidationMessage)
 )
 
-func Validate(form interface{}, interest string) error {
+func Validate(form interface{}, interest, user string) error {
 	switch interest {
-	case "profile":
-		model := form.(db.Vendor)
-		return validation.ValidateStruct(
-			&model,
-			validation.Field(&model.UserName, IsRequired, LengthMax20, ExceptSpace),
-			validation.Field(&model.Password, IsRequired, LengthMin8Max20, AlphaLower, AlphaUpper, Digits),
-			validation.Field(&model.Email, IsRequired, EmailRule),
-			validation.Field(&model.IDNumber, IsRequired, Digits, Length16),
-			validation.Field(&model.NPWP, IsRequired, Digits, LengthMin15Max16),
-			validation.Field(&model.CompanyName, IsRequired, AlphaSpace, LengthMax50),
-			validation.Field(&model.CompanyField, IsRequired, AlphaSpace, LengthMax20),
-			validation.Field(&model.CompanyType, IsRequired, AlphaSpace, LengthMax10),
-			validation.Field(&model.CompanyAddress, IsRequired, ComplexCharacters, LengthMin10Max100),
-			validation.Field(&model.CompanyPhone, IsRequired, Digits, LengthMin8Max20),
-			validation.Field(&model.Province, IsRequired, AlphaSpace, LengthMax20),
-			validation.Field(&model.City, IsRequired, AlphaSpace, LengthMax20),
-			validation.Field(&model.District, IsRequired, AlphaSpace, LengthMax20),
-		)
+	case "register":
+		switch user {
+		case "user":
+			model := form.(db.User)
+			return validation.ValidateStruct(
+				&model,
+				validation.Field(&model.UserName, IsRequired, LengthMax20, ExceptSpace),
+				validation.Field(&model.Name, IsRequired, AlphaSpace, LengthMax50),
+				validation.Field(&model.Password, IsRequired, LengthMin8Max20, AlphaLower, AlphaUpper, Digits),
+				validation.Field(&model.IDNumber, IsRequired, Digits, Length16),
+				validation.Field(&model.UserPhone, IsRequired, Digits, LengthMin8Max20),
+				validation.Field(&model.UserAddress, IsRequired, ComplexCharacters, LengthMin10Max100),
+			)
+
+		case "vendor":
+			model := form.(db.Vendor)
+			return validation.ValidateStruct(
+				&model,
+				validation.Field(&model.VendorName, IsRequired, LengthMax20, ComplexCharacters),
+				validation.Field(&model.VendorField, IsRequired, Digits),
+				validation.Field(&model.VendorType, IsRequired, Digits),
+				validation.Field(&model.VendorAddress, IsRequired, ComplexCharacters, LengthMin10Max100),
+				validation.Field(&model.VendorPhone, IsRequired, Digits, LengthMin8Max20),
+				validation.Field(&model.Email, IsRequired, EmailRule),
+				validation.Field(&model.NPWP, IsRequired, Digits, LengthMin15Max16),
+				validation.Field(&model.Province, IsRequired, Digits),
+				validation.Field(&model.City, IsRequired, Digits),
+				validation.Field(&model.District, IsRequired, Digits),
+			)
+
+		case "client":
+			model := form.(db.Client)
+			return validation.ValidateStruct(
+				&model,
+				validation.Field(&model.ClientName, IsRequired, LengthMax20, ExceptSpace),
+				validation.Field(&model.ClientParent, IsRequired, Digits),
+				validation.Field(&model.ClientField, IsRequired, Digits),
+				validation.Field(&model.ClientAddress, IsRequired, ComplexCharacters, LengthMin10Max100),
+				validation.Field(&model.ClientPhone, IsRequired, Digits, LengthMin8Max20),
+				validation.Field(&model.Email, IsRequired, EmailRule),
+				validation.Field(&model.Province, IsRequired, Digits),
+				validation.Field(&model.City, IsRequired, Digits),
+				validation.Field(&model.District, IsRequired, Digits),
+			)
+		}
 	}
 
 	return nil
