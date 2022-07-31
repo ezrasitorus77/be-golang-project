@@ -15,12 +15,17 @@ type (
 	User interface {
 		Register(*handler.Context)
 		Login(*handler.Context)
-		Index(*handler.Context)
 		Profile(*handler.Context)
+		Manage(*handler.Context)
 	}
 
 	Vendor interface {
 		Register(*handler.Context)
-		// Profile(*handler.Context)
+		Profile(*handler.Context)
+	}
+
+	Client interface {
+		Register(*handler.Context)
+		Profile(*handler.Context)
 	}
 )

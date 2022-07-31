@@ -94,7 +94,7 @@ func (m *Middleware) methodCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx = m.Ctx.Set(ctx, w, r, hFunc)
-	if incomingPath == "/login" || incomingPath == "/register" {
+	if incomingPath == "/login" || incomingPath == "/user/register" {
 		ctx.Value.HandleFunc(ctx)
 	} else {
 		m.tokenCheck(ctx, m.Ctx.DB, r)

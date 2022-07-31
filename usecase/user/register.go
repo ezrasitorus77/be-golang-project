@@ -6,14 +6,15 @@ import (
 	"be-golang-project/models/handler"
 	"be-golang-project/models/validation_"
 	"net/http"
+	"strings"
 
 	"gorm.io/gorm"
 )
 
 func (parentCtx *User) Register(context_ *handler.Context) {
 	var (
-		user db.User
-		tx   *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB).Begin()
+		userRequest db.User
+		tx          *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB).Begin()
 	)
 
 	defer func() {
@@ -22,26 +23,32 @@ func (parentCtx *User) Register(context_ *handler.Context) {
 
 	resp.W = context_.Value.Writer
 
-	if err := context_.ParseRequest(&user); err != nil {
+	if err := context_.ParseRequest(&userRequest); err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
 		return
 	}
 
-	if err := validation_.Validate(user, "register", "user"); err != nil {
+	if err := validation_.Validate(userRequest, "register", "user", tx); err != nil {
+		if strings.Contains(err.Error(), "Duplicate") {
+			resp.SendResponse(http.StatusOK, consts.DuplicateEntryRC, consts.DuplicateEntryMessage, err.Error(), err)
+
+			return
+		}
+
 		resp.SendResponse(http.StatusOK, consts.InvalidRequestBodyRC, consts.InvalidRequestBodyMessage, nil, err)
 
 		return
 	}
 
 	if err := tx.Create(&db.User{
-		UserName:    user.UserName,
-		Name:        user.Name,
-		Password:    validation_.HashPassword(user.Password, parentCtx.Salt),
-		IDNumber:    user.IDNumber,
-		UserPhone:   user.UserPhone,
-		UserAddress: user.UserAddress,
-		UserRole:    user.UserRole,
+		UserName:    userRequest.UserName,
+		Name:        userRequest.Name,
+		Password:    validation_.HashPassword(userRequest.Password, parentCtx.Salt),
+		IDNumber:    userRequest.IDNumber,
+		UserPhone:   userRequest.UserPhone,
+		UserAddress: userRequest.UserAddress,
+		IsNew:       1,
 	}).Error; err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 

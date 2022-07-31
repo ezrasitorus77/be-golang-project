@@ -28,6 +28,9 @@ const (
 	InvalidRequestBodyRC      = "005"
 	InvalidRequestBodyMessage = "Invalid request body"
 
+	DuplicateEntryRC      = "006"
+	DuplicateEntryMessage = "Duplicate entry found"
+
 	GeneralForbiddenRC      = "403"
 	GeneralForbiddenMessage = "User is not authorized"
 	InvalidTokenRC          = "010"
@@ -43,6 +46,12 @@ const (
 
 	CreatedRC      = "001"
 	CreatedMessage = "Data successfully created"
+
+	UpdatedRC      = "002"
+	UpdatedMessage = "Data successfully updated"
+
+	DeletedRC      = "003"
+	DeletedMessage = "Data successfully deleted"
 
 	GeneralInternalServerErrorRC      = "500"
 	GeneralInternalServerErrorMessage = "Internal server error"
@@ -72,9 +81,9 @@ const (
 
 	SaltSize = 16
 
-	UserNotFoundRC      = "002"
+	UserNotFoundRC      = "008"
 	UserNotFoundMessage = "User is not found"
 
-	CredentialNotMatchRC      = "003"
+	CredentialNotMatchRC      = "007"
 	CredentialNotMatchMessage = "Username and password do not match"
 )

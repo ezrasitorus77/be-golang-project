@@ -6,7 +6,6 @@ import (
 	"be-golang-project/models/handler"
 	"be-golang-project/models/interface_"
 	"be-golang-project/models/jwt"
-	"be-golang-project/models/payload"
 	"be-golang-project/models/validation_"
 	"net/http"
 	"time"
@@ -32,7 +31,7 @@ func (parentCtx *User) Login(context_ *handler.Context) {
 		return
 	}
 
-	if err = DB.Where("username = ?", requestBody.UserName).Find(&user).Error; err != nil {
+	if err = DB.Where("user_name = ?", requestBody.UserName).Find(&user).Error; err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
 		return
@@ -64,22 +63,13 @@ func (parentCtx *User) Login(context_ *handler.Context) {
 		return
 	}
 
+	// if user.IsNew == 1 {
+	// 	http.Redirect(context_.Value.Writer, context_.Value.Request, "/user/profile", http.StatusSeeOther)
+
+	// 	return
+	// }
+
 	resp.SendResponse(http.StatusOK, consts.SuccessRC, consts.SuccessMessage, newToken, nil)
-
-	return
-}
-
-func (parentCtx *User) Index(context_ *handler.Context) {
-	// var (
-	// 	user db.Vendor
-	// 	db          *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
-	// )
-
-	resp.W = context_.Value.Writer
-
-	// if
-
-	resp.SendResponse(http.StatusOK, consts.SuccessRC, consts.SuccessMessage, context_.Value.Payload.(*payload.Payload), nil)
 
 	return
 }

@@ -6,11 +6,14 @@ import (
 	"crypto/rand"
 	"crypto/sha512"
 	"encoding/base64"
+	"errors"
+	"fmt"
 	"hash"
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
+	"gorm.io/gorm"
 )
 
 var (
@@ -32,13 +35,22 @@ var (
 	Symbols           = validation.Match(regexp.MustCompile(consts.SymbolsOnlyRegex)).Error(consts.SymbolsOnlyValidationMessage)
 )
 
-func Validate(form interface{}, interest, user string) error {
+func Validate(form interface{}, interest, entity string, tx *gorm.DB) error {
+	var (
+		uniqueField []string
+		uniqueForm  []string
+	)
+
 	switch interest {
 	case "register":
-		switch user {
+		switch entity {
 		case "user":
 			model := form.(db.User)
-			return validation.ValidateStruct(
+			fieldCheck := db.User{}
+			uniqueField = []string{"user_name", "id_number", "user_phone"}
+			uniqueForm = []string{model.UserName, model.IDNumber, model.UserPhone}
+
+			if err := validation.ValidateStruct(
 				&model,
 				validation.Field(&model.UserName, IsRequired, LengthMax20, ExceptSpace),
 				validation.Field(&model.Name, IsRequired, AlphaSpace, LengthMax50),
@@ -46,11 +58,29 @@ func Validate(form interface{}, interest, user string) error {
 				validation.Field(&model.IDNumber, IsRequired, Digits, Length16),
 				validation.Field(&model.UserPhone, IsRequired, Digits, LengthMin8Max20),
 				validation.Field(&model.UserAddress, IsRequired, ComplexCharacters, LengthMin10Max100),
-			)
+			); err != nil {
+				return err
+			}
+
+			for i, f := range uniqueField {
+				if err := tx.Where(fmt.Sprintf("%s = ?", f), uniqueForm[i]).Find(&fieldCheck).Error; err != nil {
+					return err
+				}
+
+				if fieldCheck.ID != 0 {
+					return errors.New(fmt.Sprintf("Duplicate entry for %s field", f))
+				}
+			}
+
+			return nil
 
 		case "vendor":
 			model := form.(db.Vendor)
-			return validation.ValidateStruct(
+			fieldCheck := db.Vendor{}
+			uniqueField = []string{"vendor_name", "vendor_phone", "vendor_website", "vendor_email", "npwp"}
+			uniqueForm = []string{model.VendorName, model.VendorPhone, model.VendorWebsite, model.Email, model.NPWP}
+
+			if err := validation.ValidateStruct(
 				&model,
 				validation.Field(&model.VendorName, IsRequired, LengthMax20, ComplexCharacters),
 				validation.Field(&model.VendorField, IsRequired, Digits),
@@ -62,11 +92,29 @@ func Validate(form interface{}, interest, user string) error {
 				validation.Field(&model.Province, IsRequired, Digits),
 				validation.Field(&model.City, IsRequired, Digits),
 				validation.Field(&model.District, IsRequired, Digits),
-			)
+			); err != nil {
+				return err
+			}
+
+			for i, f := range uniqueField {
+				if err := tx.Where(fmt.Sprintf("%s = ?", f), uniqueForm[i]).Find(&fieldCheck).Error; err != nil {
+					return err
+				}
+
+				if fieldCheck.ID != 0 {
+					return errors.New(fmt.Sprintf("Duplicate entry for %s field", f))
+				}
+			}
+
+			return nil
 
 		case "client":
 			model := form.(db.Client)
-			return validation.ValidateStruct(
+			fieldCheck := db.Client{}
+			uniqueField = []string{"client_name", "client_phone", "client_website", "client_email"}
+			uniqueForm = []string{model.ClientName, model.ClientPhone, model.ClientWebsite, model.Email}
+
+			if err := validation.ValidateStruct(
 				&model,
 				validation.Field(&model.ClientName, IsRequired, LengthMax20, ExceptSpace),
 				validation.Field(&model.ClientParent, IsRequired, Digits),
@@ -77,7 +125,21 @@ func Validate(form interface{}, interest, user string) error {
 				validation.Field(&model.Province, IsRequired, Digits),
 				validation.Field(&model.City, IsRequired, Digits),
 				validation.Field(&model.District, IsRequired, Digits),
-			)
+			); err != nil {
+				return err
+			}
+
+			for i, f := range uniqueField {
+				if err := tx.Where(fmt.Sprintf("%s = ?", f), uniqueForm[i]).Find(&fieldCheck).Error; err != nil {
+					return err
+				}
+
+				if fieldCheck.ID != 0 {
+					return errors.New(fmt.Sprintf("Duplicate entry for %s field", f))
+				}
+			}
+
+			return nil
 		}
 	}
 
