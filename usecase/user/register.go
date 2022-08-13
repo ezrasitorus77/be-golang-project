@@ -41,15 +41,8 @@ func (parentCtx *User) Register(context_ *handler.Context) {
 		return
 	}
 
-	if err := tx.Create(&db.User{
-		UserName:    userRequest.UserName,
-		Name:        userRequest.Name,
-		Password:    validation_.HashPassword(userRequest.Password, parentCtx.Salt),
-		IDNumber:    userRequest.IDNumber,
-		UserPhone:   userRequest.UserPhone,
-		UserAddress: userRequest.UserAddress,
-		IsNew:       1,
-	}).Error; err != nil {
+	userRequest.IsNew = 1
+	if err := tx.Create(&userRequest).Error; err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
 		return

@@ -1,7 +1,7 @@
 package request
 
 type (
-	DeleteUserRequest struct {
+	DeleteIDsRequest struct {
 		ID []int `json:"user_ids"`
 	}
 )

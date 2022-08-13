@@ -32,6 +32,7 @@ var (
 	LengthMax20       = validation.Length(1, 20).Error(consts.LengthMax20ValidationMessage)
 	LengthMax50       = validation.Length(1, 50).Error(consts.LengthMax50ValidationMessage)
 	LengthMin10Max100 = validation.Length(10, 100).Error(consts.LengthMin10Max100ValidationMessage)
+	LengthMin20Max500 = validation.Length(20, 500).Error(consts.LengthMin20Max500ValidationMessage)
 	Symbols           = validation.Match(regexp.MustCompile(consts.SymbolsOnlyRegex)).Error(consts.SymbolsOnlyValidationMessage)
 )
 
@@ -67,6 +68,12 @@ func Validate(form interface{}, interest, entity string, tx *gorm.DB) error {
 					return err
 				}
 
+				if model.ID != 0 {
+					if model.ID != fieldCheck.ID {
+						return errors.New(fmt.Sprintf("Duplicate entry for %s field", f))
+					}
+				}
+
 				if fieldCheck.ID != 0 {
 					return errors.New(fmt.Sprintf("Duplicate entry for %s field", f))
 				}
@@ -77,8 +84,8 @@ func Validate(form interface{}, interest, entity string, tx *gorm.DB) error {
 		case "vendor":
 			model := form.(db.Vendor)
 			fieldCheck := db.Vendor{}
-			uniqueField = []string{"vendor_name", "vendor_phone", "vendor_website", "vendor_email", "npwp"}
-			uniqueForm = []string{model.VendorName, model.VendorPhone, model.VendorWebsite, model.Email, model.NPWP}
+			uniqueField = []string{"vendor_name", "vendor_phone", "vendor_website", "vendor_email", "npwp", "account_name", "account_number"}
+			uniqueForm = []string{model.VendorName, model.VendorPhone, model.VendorWebsite, model.Email, model.NPWP, model.AccountName, model.AccountNumber}
 
 			if err := validation.ValidateStruct(
 				&model,
@@ -89,6 +96,8 @@ func Validate(form interface{}, interest, entity string, tx *gorm.DB) error {
 				validation.Field(&model.VendorPhone, IsRequired, Digits, LengthMin8Max20),
 				validation.Field(&model.Email, IsRequired, EmailRule),
 				validation.Field(&model.NPWP, IsRequired, Digits, LengthMin15Max16),
+				validation.Field(&model.AccountName, IsRequired, AlphaSpace, LengthMax50),
+				validation.Field(&model.AccountNumber, IsRequired, Digits, LengthMax20),
 				validation.Field(&model.Province, IsRequired, Digits),
 				validation.Field(&model.City, IsRequired, Digits),
 				validation.Field(&model.District, IsRequired, Digits),
@@ -99,6 +108,12 @@ func Validate(form interface{}, interest, entity string, tx *gorm.DB) error {
 			for i, f := range uniqueField {
 				if err := tx.Where(fmt.Sprintf("%s = ?", f), uniqueForm[i]).Find(&fieldCheck).Error; err != nil {
 					return err
+				}
+
+				if model.ID != 0 {
+					if model.ID != fieldCheck.ID {
+						return errors.New(fmt.Sprintf("Duplicate entry for %s field", f))
+					}
 				}
 
 				if fieldCheck.ID != 0 {
@@ -134,12 +149,32 @@ func Validate(form interface{}, interest, entity string, tx *gorm.DB) error {
 					return err
 				}
 
+				if model.ID != 0 {
+					if model.ID != fieldCheck.ID {
+						return errors.New(fmt.Sprintf("Duplicate entry for %s field", f))
+					}
+				}
+
 				if fieldCheck.ID != 0 {
 					return errors.New(fmt.Sprintf("Duplicate entry for %s field", f))
 				}
 			}
 
 			return nil
+		}
+	case "procurement":
+		model := form.(db.Procurement)
+
+		if err := validation.ValidateStruct(
+			&model,
+			validation.Field(&model.Category, IsRequired),
+			validation.Field(&model.Title, IsRequired, LengthMax20),
+			validation.Field(&model.Body, IsRequired, LengthMin20Max500),
+			validation.Field(&model.PriceStart, IsRequired, Digits),
+			validation.Field(&model.PriceEnd, IsRequired, Digits),
+			validation.Field(&model.PaymentMethod, IsRequired, Digits),
+		); err != nil {
+			return err
 		}
 	}
 

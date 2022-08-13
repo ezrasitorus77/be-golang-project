@@ -38,14 +38,14 @@ func main() {
 	midd.Ctx = parentCtx
 
 	midd.AddRoute("/vendor/register", []string{"POST"}, newVendor.Register)
-	midd.AddRoute("/vendor/profile", []string{"GET", "POST", "DELETE"}, newVendor.Profile)
+	midd.AddRoute("/vendor/profile", []string{"GET", "PUT"}, newVendor.Profile)
 
 	midd.AddRoute("/client/register", []string{"POST"}, newClient.Register)
-	midd.AddRoute("/client/profile", []string{"GET", "POST", "DELETE"}, newClient.Profile)
+	midd.AddRoute("/client/profile", []string{"GET", "PUT"}, newClient.Profile)
 
 	midd.AddRoute("/user/register", []string{"POST"}, newUser.Register)
-	midd.AddRoute("/user/management", []string{"GET", "POST", "DELETE"}, newUser.Manage)
-	midd.AddRoute("/user/profile", []string{"GET", "POST", "DELETE"}, newUser.Profile)
+	midd.AddRoute("/user/management", []string{"GET", "POST", "PUT", "DELETE"}, newUser.Manage)
+	midd.AddRoute("/user/profile", []string{"GET", "PUT"}, newUser.Profile)
 
 	midd.AddRoute("/login", []string{"POST"}, newUser.Login)
 

@@ -13,64 +13,67 @@ import (
 )
 
 func (parentCtx *User) Profile(context_ *handler.Context) {
-	var (
-		user   db.User
-		tx     *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB).Begin()
-		method string   = context_.Value.Request.Method
-		userID int      = context_.Value.Payload.(*payload.Payload).UserID
-	)
-
-	defer func() {
-		tx.Rollback()
-	}()
-
-	resp.W = context_.Value.Writer
+	var method string = context_.Value.Request.Method
 
 	switch method {
 	case "GET":
-		if err := tx.Where("id = ?", userID).Find(&user).Error; err != nil {
-			resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+		getProfile(context_)
+	case "PUT":
+		editProfile(context_)
+	}
+}
 
-			return
-		}
+func getProfile(context_ *handler.Context) {
+	var (
+		user   db.User
+		DB     *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
+		userID int      = context_.Value.Payload.(*payload.Payload).UserID
+	)
 
-		resp.SendResponse(http.StatusOK, consts.SuccessRC, consts.SuccessMessage, user, nil)
+	resp.W = context_.Value.Writer
 
-		return
+	if err := DB.Where("id = ?", userID).Find(&user).Error; err != nil {
+		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-	case "POST":
-		if err := context_.ParseRequest(&user); err != nil {
-			resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
-
-			return
-		}
-
-		if err := validation_.Validate(user, "register", "user", tx); err != nil {
-			if strings.Contains(err.Error(), "Duplicate") {
-				resp.SendResponse(http.StatusOK, consts.DuplicateEntryRC, consts.DuplicateEntryMessage, err.Error(), err)
-
-				return
-			}
-
-			resp.SendResponse(http.StatusOK, consts.InvalidRequestBodyRC, consts.InvalidRequestBodyMessage, nil, err)
-
-			return
-		}
-
-		if err := tx.Save(&user).Error; err != nil {
-			resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
-
-			return
-		}
-
-		tx.Commit()
-
-		resp.SendResponse(http.StatusCreated, consts.UpdatedRC, consts.UpdatedMessage, "Successfully update user profile", nil)
-
-		return
-
-	default:
 		return
 	}
 
+	resp.SendResponse(http.StatusOK, consts.SuccessRC, consts.SuccessMessage, user, nil)
+
+	return
+}
+
+func editProfile(context_ *handler.Context) {
+	var (
+		user db.User
+		DB   *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
+	)
+
+	if err := context_.ParseRequest(&user); err != nil {
+		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+
+		return
+	}
+
+	if err := validation_.Validate(user, "register", "user", DB); err != nil {
+		if strings.Contains(err.Error(), "Duplicate") {
+			resp.SendResponse(http.StatusOK, consts.DuplicateEntryRC, consts.DuplicateEntryMessage, err.Error(), err)
+
+			return
+		}
+
+		resp.SendResponse(http.StatusOK, consts.InvalidRequestBodyRC, consts.InvalidRequestBodyMessage, nil, err)
+
+		return
+	}
+
+	if err := DB.Save(&user).Error; err != nil {
+		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+
+		return
+	}
+
+	resp.SendResponse(http.StatusCreated, consts.UpdatedRC, consts.UpdatedMessage, "Successfully update user profile", nil)
+
+	return
 }

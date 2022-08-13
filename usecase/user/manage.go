@@ -21,8 +21,10 @@ func (parentCtx *User) Manage(context_ *handler.Context) {
 		getUsers(context_)
 	case "POST":
 		addUser(context_, parentCtx.Salt)
+	case "PUT":
+		editUser(context_)
 	case "DELETE":
-		deleteUser(context_)
+		deleteUsers(context_)
 	}
 }
 
@@ -55,13 +57,9 @@ func getUsers(context_ *handler.Context) {
 func addUser(context_ *handler.Context, salt []byte) {
 	var (
 		childUserRequest db.User
-		tx               *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB).Begin()
+		DB               *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
 		companyID        db.User
 	)
-
-	defer func() {
-		tx.Rollback()
-	}()
 
 	resp.W = context_.Value.Writer
 
@@ -71,7 +69,7 @@ func addUser(context_ *handler.Context, salt []byte) {
 		return
 	}
 
-	if err := validation_.Validate(childUserRequest, "register", "user", tx); err != nil {
+	if err := validation_.Validate(childUserRequest, "register", "user", DB); err != nil {
 		if strings.Contains(err.Error(), "Duplicate") {
 			resp.SendResponse(http.StatusOK, consts.DuplicateEntryRC, consts.DuplicateEntryMessage, err.Error(), err)
 
@@ -83,13 +81,13 @@ func addUser(context_ *handler.Context, salt []byte) {
 		return
 	}
 
-	if err := tx.Where("id =?", context_.Value.Payload.(*payload.Payload).UserID).Find(&companyID).Error; err != nil {
+	if err := DB.Where("id =?", context_.Value.Payload.(*payload.Payload).UserID).Find(&companyID).Error; err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
 		return
 	}
 
-	if err := tx.Create(&db.User{
+	if err := DB.Create(&db.User{
 		UserName:    childUserRequest.UserName,
 		Name:        childUserRequest.Name,
 		Password:    validation_.HashPassword(childUserRequest.Password, salt),
@@ -105,17 +103,53 @@ func addUser(context_ *handler.Context, salt []byte) {
 		return
 	}
 
-	tx.Commit()
-
 	resp.SendResponse(http.StatusCreated, consts.CreatedRC, consts.CreatedMessage, "Successfully registered new user", nil)
 
 	return
 }
 
-func deleteUser(context_ *handler.Context) {
+func editUser(context_ *handler.Context) {
+	var (
+		childUserRequest db.User
+		DB               *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
+	)
+
+	resp.W = context_.Value.Writer
+
+	if err := context_.ParseRequest(&childUserRequest); err != nil {
+		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+
+		return
+	}
+
+	if err := validation_.Validate(childUserRequest, "register", "user", DB); err != nil {
+		if strings.Contains(err.Error(), "Duplicate") {
+			resp.SendResponse(http.StatusOK, consts.DuplicateEntryRC, consts.DuplicateEntryMessage, err.Error(), err)
+
+			return
+		}
+
+		resp.SendResponse(http.StatusOK, consts.InvalidRequestBodyRC, consts.InvalidRequestBodyMessage, nil, err)
+
+		return
+	}
+
+	if err := DB.Save(&childUserRequest).Error; err != nil {
+		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+
+		return
+	}
+
+	resp.SendResponse(http.StatusCreated, consts.UpdatedRC, consts.UpdatedMessage, "Successfully update user profile", nil)
+
+	return
+
+}
+
+func deleteUsers(context_ *handler.Context) {
 	var (
 		tx             *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB).Begin()
-		userIDsRequest request.DeleteUserRequest
+		usersIDRequest request.DeleteIDsRequest
 	)
 
 	defer func() {
@@ -124,13 +158,13 @@ func deleteUser(context_ *handler.Context) {
 
 	resp.W = context_.Value.Writer
 
-	if err := context_.ParseRequest(&userIDsRequest); err != nil {
+	if err := context_.ParseRequest(&usersIDRequest); err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
 		return
 	}
 
-	for _, i := range userIDsRequest.ID {
+	for _, i := range usersIDRequest.ID {
 		if err := tx.Where("id = ?", i).Delete(&db.User{}).Error; err != nil {
 			resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 

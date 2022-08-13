@@ -43,20 +43,8 @@ func (parentCtx *Client) Register(context_ *handler.Context) {
 		return
 	}
 
-	if err := tx.Create(&db.Client{
-		ClientName:    clientRequest.ClientName,
-		ClientParent:  clientRequest.ClientParent,
-		ClientField:   clientRequest.ClientField,
-		ClientAddress: clientRequest.ClientAddress,
-		ClientPhone:   clientRequest.ClientPhone,
-		ClientWebsite: clientRequest.ClientWebsite,
-		Email:         clientRequest.Email,
-		SocialMedia:   clientRequest.SocialMedia,
-		Province:      clientRequest.Province,
-		District:      clientRequest.District,
-		Avatar:        clientRequest.Avatar,
-		IsNew:         1,
-	}).Error; err != nil {
+	clientRequest.IsNew = 1
+	if err := tx.Create(&clientRequest).Error; err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
 		return

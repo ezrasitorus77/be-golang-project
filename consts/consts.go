@@ -71,6 +71,7 @@ const (
 	LengthMax20ValidationMessage       = "Maximum characters is 20"
 	LengthMax10ValidationMessage       = "Maximum characters is 10"
 	LengthMin10Max100ValidationMessage = "Field must contain 10 - 100 characters"
+	LengthMin20Max500ValidationMessage = "Field must contain 20 - 500 characters"
 
 	MinSecretKeySize = 32.
 

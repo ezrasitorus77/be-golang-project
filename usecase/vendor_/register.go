@@ -43,22 +43,8 @@ func (parentCtx *Vendor) Register(context_ *handler.Context) {
 		return
 	}
 
-	if err := tx.Create(&db.Vendor{
-		VendorName:    vendorRequest.VendorName,
-		VendorField:   vendorRequest.VendorField,
-		VendorType:    vendorRequest.VendorType,
-		VendorAddress: vendorRequest.VendorAddress,
-		VendorPhone:   vendorRequest.VendorPhone,
-		VendorWebsite: vendorRequest.VendorWebsite,
-		Email:         vendorRequest.Email,
-		NPWP:          vendorRequest.NPWP,
-		SocialMedia:   vendorRequest.SocialMedia,
-		Province:      vendorRequest.Province,
-		City:          vendorRequest.City,
-		District:      vendorRequest.District,
-		Avatar:        vendorRequest.Avatar,
-		IsNew:         1,
-	}).Error; err != nil {
+	vendorRequest.IsNew = 1
+	if err := tx.Create(&vendorRequest).Error; err != nil {
 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
 		return
