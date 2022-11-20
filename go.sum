@@ -5,6 +5,16 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
+github.com/ezrasitorus77/http-handler v0.0.0-20221120112022-e6125475ab24 h1:g4aAVeQpdMWGt4OEA3xzStZcQLPTk/qSSBYGpMJH1ps=
+github.com/ezrasitorus77/http-handler v0.0.0-20221120112022-e6125475ab24/go.mod h1:EtV2QmtMc0jY10L6J++PwSFL0DUIDyDEWdTutswQuVg=
+github.com/ezrasitorus77/http-handler v0.0.0-20221120120442-e9f92b3ace4b h1:t+5KSUSByV+oq96QNzaekysZroWh+qV/+O7FcsRiehY=
+github.com/ezrasitorus77/http-handler v0.0.0-20221120120442-e9f92b3ace4b/go.mod h1:EtV2QmtMc0jY10L6J++PwSFL0DUIDyDEWdTutswQuVg=
+github.com/ezrasitorus77/http-handler v0.0.0-20221120120943-5617bc509b9b h1:uzRvGYnxFQJ+ulTVC09eLx4UzWi9b/lOHvktUcucrT8=
+github.com/ezrasitorus77/http-handler v0.0.0-20221120120943-5617bc509b9b/go.mod h1:EtV2QmtMc0jY10L6J++PwSFL0DUIDyDEWdTutswQuVg=
+github.com/ezrasitorus77/http-handler v0.0.0-20221120144730-b4e1b58015a2 h1:20fiZhgGlQalvkXao3HxxgLUQBmzL4bnLgQUNFH9mHM=
+github.com/ezrasitorus77/http-handler v0.0.0-20221120144730-b4e1b58015a2/go.mod h1:EtV2QmtMc0jY10L6J++PwSFL0DUIDyDEWdTutswQuVg=
+github.com/ezrasitorus77/http-handler v0.0.0-20221120153027-99a063c7f1fe h1:/KsyN7CP5MkY2zm7mXZ5EfN4FQ7+1zReVZaSybHyFF4=
+github.com/ezrasitorus77/http-handler v0.0.0-20221120153027-99a063c7f1fe/go.mod h1:EtV2QmtMc0jY10L6J++PwSFL0DUIDyDEWdTutswQuVg=
 github.com/go-ozzo/ozzo-validation v3.6.0+incompatible h1:msy24VGS42fKO9K1vLz82/GeYW1cILu7Nuuj1N3BBkE=
 github.com/go-ozzo/ozzo-validation v3.6.0+incompatible/go.mod h1:gsEKFIVnabGBt6mXmxK0MoFy+cZoTJY6mu5Ll3LVLBU=
 github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
@@ -16,6 +26,8 @@ github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkr
 github.com/jinzhu/now v1.1.4/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/z8=
 github.com/jinzhu/now v1.1.5 h1:/o9tlHleP7gOFmsnYNz3RGnqzefHA47wQpKrrdTIwXQ=
 github.com/jinzhu/now v1.1.5/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/z8=
+github.com/joho/godotenv v1.4.0 h1:3l4+N6zfMWnkbPEXKng2o2/MR5mSwTrBih4ZEkkz1lg=
+github.com/joho/godotenv v1.4.0/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

@@ -1,20 +1,20 @@
 package client
 
-import (
-	"be-golang-project/models/handler"
-	"be-golang-project/models/response"
-)
+// import (
+// 	"be-golang-project/models/handler"
+// 	"be-golang-project/models/response"
+// )
 
-var (
-	resp *response.Response = &response.Response{}
-)
+// var (
+// 	resp *response.Response = &response.Response{}
+// )
 
-type Client struct {
-	handler.ParentContext
-}
+// type Client struct {
+// 	handler.ParentContext
+// }
 
-func New() *Client {
-	var newClient Client
+// func New() *Client {
+// 	var newClient Client
 
-	return &newClient
-}
+// 	return &newClient
+// }

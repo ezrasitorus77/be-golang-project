@@ -1,191 +1,191 @@
 package vendor
 
-import (
-	"be-golang-project/consts"
-	"be-golang-project/models/db"
-	"be-golang-project/models/handler"
-	"be-golang-project/models/payload"
-	"be-golang-project/models/request"
-	"be-golang-project/models/validation_"
-	"net/http"
-	"strings"
+// import (
+// 	"be-golang-project/consts"
+// 	"be-golang-project/models/db"
+// 	"be-golang-project/models/handler"
+// 	"be-golang-project/models/payload"
+// 	"be-golang-project/models/request"
+// 	"be-golang-project/models/validation_"
+// 	"net/http"
+// 	"strings"
 
-	"gorm.io/gorm"
-)
+// 	"gorm.io/gorm"
+// )
 
-func (parentCtx *Vendor) Procurement(context_ *handler.Context) {
-	var method string = context_.Value.Request.Method
+// func (parentCtx *Vendor) Procurement(context_ *handler.Context) {
+// 	var method string = context_.Value.Request.Method
 
-	switch method {
-	case "GET":
-		getProcurements(context_)
-	case "POST":
-		addProcurement(context_)
-	case "PUT":
-		editProcurement(context_)
-	case "DELETE":
-		deleteProcurement(context_)
-	}
-}
+// 	switch method {
+// 	case "GET":
+// 		getProcurements(context_)
+// 	case "POST":
+// 		addProcurement(context_)
+// 	case "PUT":
+// 		editProcurement(context_)
+// 	case "DELETE":
+// 		deleteProcurement(context_)
+// 	}
+// }
 
-func getProcurements(context_ *handler.Context) {
-	var (
-		procurements []db.Procurement
-		user         db.User
-		DB           *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
-		userId       int      = context_.Value.Payload.(*payload.Payload).UserID
-	)
+// func getProcurements(context_ *handler.Context) {
+// 	var (
+// 		procurements []db.Procurement
+// 		user         db.User
+// 		DB           *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
+// 		userId       int      = context_.Value.Payload.(*payload.Payload).UserID
+// 	)
 
-	resp.W = context_.Value.Writer
+// 	resp.W = context_.Value.Writer
 
-	if err := DB.Where("id = ?", userId).Find(&user).Error; err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := DB.Where("id = ?", userId).Find(&user).Error; err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	if err := DB.Where("company_id = ?", user.CompanyID).Find(&procurements).Error; err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := DB.Where("company_id = ?", user.CompanyID).Find(&procurements).Error; err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	resp.SendResponse(http.StatusOK, consts.SuccessRC, consts.SuccessMessage, procurements, nil)
+// 	resp.SendResponse(http.StatusOK, consts.SuccessRC, consts.SuccessMessage, procurements, nil)
 
-	return
-}
+// 	return
+// }
 
-func addProcurement(context_ *handler.Context) {
-	var (
-		procurement db.Procurement
-		user        db.User
-		DB          *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
-		userId      int      = context_.Value.Payload.(*payload.Payload).UserID
-	)
+// func addProcurement(context_ *handler.Context) {
+// 	var (
+// 		procurement db.Procurement
+// 		user        db.User
+// 		DB          *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
+// 		userId      int      = context_.Value.Payload.(*payload.Payload).UserID
+// 	)
 
-	resp.W = context_.Value.Writer
+// 	resp.W = context_.Value.Writer
 
-	if err := context_.ParseRequest(&procurement); err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := context_.ParseRequest(&procurement); err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	if err := validation_.Validate(procurement, "procurement", "", DB); err != nil {
-		if strings.Contains(err.Error(), "Duplicate") {
-			resp.SendResponse(http.StatusOK, consts.DuplicateEntryRC, consts.DuplicateEntryMessage, err.Error(), err)
+// 	if err := validation_.Validate(procurement, "procurement", "", DB); err != nil {
+// 		if strings.Contains(err.Error(), "Duplicate") {
+// 			resp.SendResponse(http.StatusOK, consts.DuplicateEntryRC, consts.DuplicateEntryMessage, err.Error(), err)
 
-			return
-		}
+// 			return
+// 		}
 
-		resp.SendResponse(http.StatusOK, consts.InvalidRequestBodyRC, consts.InvalidRequestBodyMessage, nil, err)
+// 		resp.SendResponse(http.StatusOK, consts.InvalidRequestBodyRC, consts.InvalidRequestBodyMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	if err := DB.Where("id = ?", userId).Find(&user).Error; err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := DB.Where("id = ?", userId).Find(&user).Error; err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	procurement.VendorID = user.CompanyID
-	if user.UserRole == 0 {
-		procurement.EditedBySuper = 1
-	}
+// 	procurement.VendorID = user.CompanyID
+// 	if user.UserRole == 0 {
+// 		procurement.EditedBySuper = 1
+// 	}
 
-	if err := DB.Create(&procurement).Error; err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := DB.Create(&procurement).Error; err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	resp.SendResponse(http.StatusCreated, consts.CreatedRC, consts.CreatedMessage, "Successfully create new procurement", nil)
+// 	resp.SendResponse(http.StatusCreated, consts.CreatedRC, consts.CreatedMessage, "Successfully create new procurement", nil)
 
-	return
+// 	return
 
-}
+// }
 
-func editProcurement(context_ *handler.Context) {
-	var (
-		procurement db.Procurement
-		user        db.User
-		DB          *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
-		userId      int      = context_.Value.Payload.(*payload.Payload).UserID
-	)
+// func editProcurement(context_ *handler.Context) {
+// 	var (
+// 		procurement db.Procurement
+// 		user        db.User
+// 		DB          *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB)
+// 		userId      int      = context_.Value.Payload.(*payload.Payload).UserID
+// 	)
 
-	resp.W = context_.Value.Writer
+// 	resp.W = context_.Value.Writer
 
-	if err := context_.ParseRequest(&procurement); err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := context_.ParseRequest(&procurement); err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	if err := validation_.Validate(procurement, "procurement", "", DB); err != nil {
-		if strings.Contains(err.Error(), "Duplicate") {
-			resp.SendResponse(http.StatusOK, consts.DuplicateEntryRC, consts.DuplicateEntryMessage, err.Error(), err)
+// 	if err := validation_.Validate(procurement, "procurement", "", DB); err != nil {
+// 		if strings.Contains(err.Error(), "Duplicate") {
+// 			resp.SendResponse(http.StatusOK, consts.DuplicateEntryRC, consts.DuplicateEntryMessage, err.Error(), err)
 
-			return
-		}
+// 			return
+// 		}
 
-		resp.SendResponse(http.StatusOK, consts.InvalidRequestBodyRC, consts.InvalidRequestBodyMessage, nil, err)
+// 		resp.SendResponse(http.StatusOK, consts.InvalidRequestBodyRC, consts.InvalidRequestBodyMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	if err := DB.Where("id = ?", userId).Find(&user).Error; err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := DB.Where("id = ?", userId).Find(&user).Error; err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	if user.UserRole == 0 {
-		procurement.EditedBySuper = 1
-	}
+// 	if user.UserRole == 0 {
+// 		procurement.EditedBySuper = 1
+// 	}
 
-	if err := DB.Save(&procurement).Error; err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := DB.Save(&procurement).Error; err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	resp.SendResponse(http.StatusCreated, consts.UpdatedRC, consts.UpdatedMessage, "Successfully update procurement", nil)
+// 	resp.SendResponse(http.StatusCreated, consts.UpdatedRC, consts.UpdatedMessage, "Successfully update procurement", nil)
 
-	return
+// 	return
 
-}
+// }
 
-func deleteProcurement(context_ *handler.Context) {
-	var (
-		tx                    *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB).Begin()
-		procurementsIDRequest request.DeleteIDsRequest
-	)
+// func deleteProcurement(context_ *handler.Context) {
+// 	var (
+// 		tx                    *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB).Begin()
+// 		procurementsIDRequest request.DeleteIDsRequest
+// 	)
 
-	defer func() {
-		tx.Rollback()
-	}()
+// 	defer func() {
+// 		tx.Rollback()
+// 	}()
 
-	resp.W = context_.Value.Writer
+// 	resp.W = context_.Value.Writer
 
-	if err := context_.ParseRequest(&procurementsIDRequest); err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := context_.ParseRequest(&procurementsIDRequest); err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	for _, i := range procurementsIDRequest.ID {
-		if err := tx.Where("id = ?", i).Delete(&db.Procurement{}).Error; err != nil {
-			resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	for _, i := range procurementsIDRequest.ID {
+// 		if err := tx.Where("id = ?", i).Delete(&db.Procurement{}).Error; err != nil {
+// 			resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-			return
-		}
-	}
+// 			return
+// 		}
+// 	}
 
-	tx.Commit()
+// 	tx.Commit()
 
-	resp.SendResponse(http.StatusCreated, consts.DeletedRC, consts.DeletedMessage, "Successfully deleted procurement(s)", nil)
+// 	resp.SendResponse(http.StatusCreated, consts.DeletedRC, consts.DeletedMessage, "Successfully deleted procurement(s)", nil)
 
-	return
+// 	return
 
-}
+// }

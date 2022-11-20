@@ -1,20 +1,20 @@
 package user
 
-import (
-	"be-golang-project/models/handler"
-	"be-golang-project/models/response"
-)
+// import (
+// 	"be-golang-project/models/handler"
+// 	"be-golang-project/models/response"
+// )
 
-var (
-	resp *response.Response = &response.Response{}
-)
+// var (
+// 	resp *response.Response = &response.Response{}
+// )
 
-type User struct {
-	handler.ParentContext
-}
+// type User struct {
+// 	handler.ParentContext
+// }
 
-func New() *User {
-	var newUser User
+// func New() *User {
+// 	var newUser User
 
-	return &newUser
-}
+// 	return &newUser
+// }

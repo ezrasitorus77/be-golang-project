@@ -1,7 +1,7 @@
 package helper
 
 import (
-	"be-golang-project/consts"
+	"be-golang-project/internal/consts"
 	"math"
 	"math/rand"
 	"time"
@@ -18,4 +18,16 @@ func GenerateRandomKey(size float64) string {
 	}
 
 	return key
+}
+
+func GenerateRandomSalt(saltSize int) ([]byte, error) {
+	var salt = make([]byte, saltSize)
+
+	_, err := rand.Read(salt[:])
+
+	if err != nil {
+		return nil, err
+	}
+
+	return salt, nil
 }

@@ -1,70 +1,70 @@
 package vendor
 
-import (
-	"be-golang-project/consts"
-	"be-golang-project/models/db"
-	"be-golang-project/models/handler"
-	"be-golang-project/models/payload"
-	"be-golang-project/models/validation_"
-	"net/http"
-	"strings"
+// import (
+// 	"be-golang-project/consts"
+// 	"be-golang-project/models/db"
+// 	"be-golang-project/models/handler"
+// 	"be-golang-project/models/payload"
+// 	"be-golang-project/models/validation_"
+// 	"net/http"
+// 	"strings"
 
-	"gorm.io/gorm"
-)
+// 	"gorm.io/gorm"
+// )
 
-func (parentCtx *Vendor) Register(context_ *handler.Context) {
-	var (
-		vendorRequest db.Vendor
-		vendorID      db.Vendor
-		tx            *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB).Begin()
-	)
+// func (parentCtx *Vendor) Register(context_ *handler.Context) {
+// 	var (
+// 		vendorRequest db.Vendor
+// 		vendorID      db.Vendor
+// 		tx            *gorm.DB = context_.ChildCtx.Value("DB").(*gorm.DB).Begin()
+// 	)
 
-	defer func() {
-		tx.Rollback()
-	}()
+// 	defer func() {
+// 		tx.Rollback()
+// 	}()
 
-	resp.W = context_.Value.Writer
+// 	resp.W = context_.Value.Writer
 
-	if err := context_.ParseRequest(&vendorRequest); err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := context_.ParseRequest(&vendorRequest); err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	if err := validation_.Validate(vendorRequest, "register", "vendor", tx); err != nil {
-		if strings.Contains(err.Error(), "Duplicate") {
-			resp.SendResponse(http.StatusOK, consts.DuplicateEntryRC, consts.DuplicateEntryMessage, err.Error(), err)
+// 	if err := validation_.Validate(vendorRequest, "register", "vendor", tx); err != nil {
+// 		if strings.Contains(err.Error(), "Duplicate") {
+// 			resp.SendResponse(http.StatusOK, consts.DuplicateEntryRC, consts.DuplicateEntryMessage, err.Error(), err)
 
-			return
-		}
+// 			return
+// 		}
 
-		resp.SendResponse(http.StatusOK, consts.InvalidRequestBodyRC, consts.InvalidRequestBodyMessage, nil, err)
+// 		resp.SendResponse(http.StatusOK, consts.InvalidRequestBodyRC, consts.InvalidRequestBodyMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	vendorRequest.IsNew = 1
-	if err := tx.Create(&vendorRequest).Error; err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	vendorRequest.IsNew = 1
+// 	if err := tx.Create(&vendorRequest).Error; err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	if err := tx.Where("vendor_name = ?", vendorRequest.VendorName).Find(&vendorID).Error; err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := tx.Where("vendor_name = ?", vendorRequest.VendorName).Find(&vendorID).Error; err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	if err := tx.Model(&db.User{}).Where("id = ?", context_.Value.Payload.(*payload.Payload).UserID).Update("company_id", vendorID.ID).Error; err != nil {
-		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
+// 	if err := tx.Model(&db.User{}).Where("id = ?", context_.Value.Payload.(*payload.Payload).UserID).Update("company_id", vendorID.ID).Error; err != nil {
+// 		resp.SendResponse(http.StatusInternalServerError, consts.GeneralInternalServerErrorRC, consts.GeneralInternalServerErrorMessage, nil, err)
 
-		return
-	}
+// 		return
+// 	}
 
-	tx.Commit()
+// 	tx.Commit()
 
-	resp.SendResponse(http.StatusCreated, consts.CreatedRC, consts.CreatedMessage, "Successfully registered new vendor", nil)
+// 	resp.SendResponse(http.StatusCreated, consts.CreatedRC, consts.CreatedMessage, "Successfully registered new vendor", nil)
 
-	return
-}
+// 	return
+// }

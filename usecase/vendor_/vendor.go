@@ -1,20 +1,20 @@
 package vendor
 
-import (
-	"be-golang-project/models/handler"
-	"be-golang-project/models/response"
-)
+// import (
+// 	"be-golang-project/models/handler"
+// 	"be-golang-project/models/response"
+// )
 
-var (
-	resp *response.Response = &response.Response{}
-)
+// var (
+// 	resp *response.Response = &response.Response{}
+// )
 
-type Vendor struct {
-	handler.ParentContext
-}
+// type Vendor struct {
+// 	handler.ParentContext
+// }
 
-func New() *Vendor {
-	var newVendor Vendor
+// func New() *Vendor {
+// 	var newVendor Vendor
 
-	return &newVendor
-}
+// 	return &newVendor
+// }
